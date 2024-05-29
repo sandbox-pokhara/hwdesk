@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hwdesk"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
     "ch9329==1.1.2",
     "opencv-cam-idx==1.0.1",
@@ -23,6 +23,9 @@ classifiers = ["Programming Language :: Python :: 3"]
 [project.urls]
 Homepage = "https://github.com/sandbox-pokhara/hwdesk"
 Issues = "https://github.com/sandbox-pokhara/hwdesk/issues"
+
+[project.gui-scripts]
+hwdesk = "hwdesk.__main__:main"
 
 [tool.setuptools]
 include-package-data = true
