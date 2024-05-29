@@ -10,9 +10,24 @@ pip install hwdesk
 
 ## Usage
 
+To start the program,
+
 ```
-hwdesk SERVER_NAME
+hwdesk
 ```
+
+To specify the framerate,
+
+```
+hwdesk --fps 10
+```
+
+To exit the program, press `alt+f4` or `esc`.
+
+## Limitations
+
+- Mouse Drag
+- Alt+Tab, Alt+F4, Win+R, etc
 
 ## License
 
