@@ -40,3 +40,4 @@ preview = true
 
 [tool.pyright]
 typeCheckingMode = "strict"
+include = ["hwdesk", "test.py"]
