@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hwdesk"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
     "ch9329==1.1.2",
     "opencv-cam-idx==1.0.1",
