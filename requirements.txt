@@ -1,0 +1,5 @@
+ch9329==1.1.2
+opencv-cam-idx==1.0.1
+opencv-python==4.9.0.80
+pydantic==2.6.4
+pillow==10.3.0

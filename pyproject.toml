@@ -5,8 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hwdesk"
 version = "1.0.0"
-dependencies = []
-requires-python = ">=3"
+dependencies = [
+    "ch9329==1.1.2",
+    "opencv-cam-idx==1.0.1",
+    "opencv-python==4.9.0.80",
+    "pydantic==2.6.4",
+    "pillow==10.3.0",
+]
+requires-python = ">=3.11"
 authors = [{ name = "Pradish Bijukchhe", email = "pradish@sandbox.com.np" }]
 description = ""
 readme = "README.md"
