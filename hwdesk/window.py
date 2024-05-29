@@ -14,6 +14,7 @@ from hwdesk.actions.actions import Action
 from hwdesk.actions.actions import Click
 from hwdesk.actions.actions import Move
 from hwdesk.actions.actions import PressAndRelease
+from hwdesk.controls.key_map import get_key_with_type
 
 
 @dataclass()
@@ -120,26 +121,6 @@ class ImgWindow:
 
         # list of actions registered
         self.actions: queue.Queue[Action] = queue.Queue()
-        # modifers
-        # TODO: add more modifiers
-        self.modifers_table = {
-            "shift_l": "shift",
-            "shift_r": "shift",
-            "control_r": "ctrl",
-            "control_l": "ctrl",
-            # SUPER KEY IS DIFFERENT FOR MACOS
-            "super_l": "win",
-            "super_r": "win",
-            "alt_l": "alt",
-            "alt_r": "alt",
-            "space": " ",
-            "period": ".",
-            "backspace": "\b",
-            "enter": "\r",
-            "escape": "\x1b",
-            "quotedbl": '"',
-            "quote": "'",
-        }
 
     def imshow(self, img: MatLike | NDArray[Any], delay_ms: int = 100):
         """
@@ -197,19 +178,6 @@ class ImgWindow:
         """
         self.root.mainloop()
 
-    def keyboard_callback(self, keys: list[str], event: int):
-        if event == KeyEvent.MultiPress:
-            dup_buff: list[str] = []
-            for i in keys:
-                key = self.modifers_table.get(i, i)
-                if key not in dup_buff:
-                    self.actions.put(PressAndRelease(key=key))
-                    dup_buff.append(key)
-        elif event == KeyEvent.Press and keys:
-            self.actions.put(
-                PressAndRelease(key=self.modifers_table.get(keys[0], keys[0]))
-            )
-
     def mouse_callback(self, event: tk.Event, e_type: str):  # type:ignore
         relx, rely = event.x, event.y
         if e_type == "left":
@@ -227,8 +195,31 @@ class ImgWindow:
         x *= mere_pixel
         y *= mere_pixel
         event.x = x
+
         event.y = y
         self.mouse_callback(event, "move")  # type:ignore
+
+    def keyboard_callback(self, keys: list[str], event: int):
+        action: Action = Action()
+        if event == KeyEvent.MultiPress:
+            modif: str = ""
+            nkey: str = ""
+            for key in keys:
+                mdf, key = get_key_with_type(key)
+                if mdf:
+                    modif = key
+                else:
+                    nkey = key
+
+            action = PressAndRelease(key=nkey, modifier=modif)
+        elif event == KeyEvent.Press and keys:
+            modif = ""
+            mdf, nkey = get_key_with_type(keys[0])
+            if mdf:
+                modif = nkey
+                nkey = ""
+            action = PressAndRelease(key=nkey, modifier=modif)
+        self.actions.put(action)
 
     def _on_key_down(self, event: tk.Event):  # type:ignore
         keys = (
@@ -237,6 +228,7 @@ class ImgWindow:
             else []
         )
         event_type: int = KeyEvent.Press
+
         if len(keys) > 1:
             event_type: int = KeyEvent.MultiPress
 

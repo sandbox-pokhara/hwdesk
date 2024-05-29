@@ -7,10 +7,6 @@ import numpy as np
 from cv2.typing import MatLike
 from numpy.typing import NDArray
 
-from hwdesk.actions.actions import Click
-from hwdesk.actions.actions import Move
-from hwdesk.actions.actions import MoveAndClick
-from hwdesk.actions.actions import PressAndRelease
 from hwdesk.camera.base import BaseCamera
 from hwdesk.camera.ms2130 import MS2130
 from hwdesk.controls.base import BaseControls
@@ -23,8 +19,6 @@ def gui_thread(
     img_queue: queue.Queue[MatLike | NDArray[Any]],
     controller: BaseControls,
 ):
-    modiers = {"shift": "shift", "ctrl": "ctrl", "win": "win", "alt": "alt"}
-    pressed: list[str] = []
     while window.root.winfo_exists():
         try:
             img = img_queue.get_nowait()
@@ -34,28 +28,8 @@ def gui_thread(
         if not window.actions.empty():
             while not window.actions.empty():
                 act = window.actions.get()
-                keyt: tuple[bool, str] = (False, "")
-                if isinstance(act, PressAndRelease):
-                    keyt = (False, act.key)
-                modifier = modiers.get(keyt[1], "")
-                key = keyt[1]
-                if modifier != key and key and not keyt[0]:
-                    if pressed:
-                        modifier = pressed.pop()
-                    print(f"{key=}+{modifier=}, COM5")
+                act.execute(controller)
 
-                elif not keyt[0] and modifier:
-                    pressed.append(modifier)
-                elif keyt[0] and modifier:
-                    pressed = [i for i in pressed if i != keyt[1]]
-                if (
-                    isinstance(act, MoveAndClick)
-                    or isinstance(act, Move)
-                    or isinstance(act, Click)
-                ):
-                    act.execute(controller)
-        else:
-            pressed.clear()
         time.sleep(1 / 30)
 
 
