@@ -94,14 +94,6 @@ class GUI(tk.Tk):
         except InvalidKey as e:
             logger.error(f"Invalidkey: {e.args}")
 
-    def win_key_press(self, _: Any | None = None):
-        try:
-            self.ch9329.press("gui", 0)
-        except InvalidKey as e:
-            logger.error(f"Invalidkey: {e.args}")
-        else:
-            self.ch9329.release()
-
     def on_move(self, event: Any):
         mere_pixel = 1
         x, y = event.x // mere_pixel, event.y // mere_pixel
