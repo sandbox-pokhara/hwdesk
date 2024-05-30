@@ -2,21 +2,21 @@ import time
 
 from ch9329 import keyboard
 from ch9329 import mouse
+from ch9329.keyboard import Modifier
 from serial import Serial
 
-MODIFIERS = {
-    0x0001: "shift",
-    0x0004: "ctrl",
-    0x0008: "alt_left",  # does not work
-    0x0080: "alt_right",  # does not work
-    0x20000: "alt",
-}
-
 KEY_MAP = {
+    "left windows": "win",
+    "right windows": "win",
+    "left shift": "shift",
+    "right shift": "shift",
+    "left ctrl": "ctrl",
+    "right ctrl": "ctrl",
     "space": " ",
+    "decimal": ".",
     "period": ".",
     "backspace": "backspace",
-    "enter": "\r",
+    "enter": "\n",
     "escape": "\x1b",
     "quotedbl": '"',
     "quote": "'",
@@ -38,6 +38,7 @@ KEY_MAP = {
     "plus": "+",
     "tab": "\t",
     "caps_lock": "caps_lock",
+    "caps lock": "caps_lock",
     "bracketleft": "[",
     "bracketright": "]",
     "braceleft": "{",
@@ -55,6 +56,25 @@ KEY_MAP = {
     "return": "\n",
     "prior": "page_up",
     "next": "page_down",
+    "page up": "page_up",
+    "page down": "page_down",
+    "print screen": "print_screen",
+    "scroll lock": "scroll_lock",
+}
+
+MODIFIER_MAP: dict[str, Modifier] = {
+    "windows": "win",
+    "left windows": "win_left",
+    "right windows": "win_right",
+    "alt": "alt",
+    "left alt": "alt_left",
+    "right alt": "alt_right",
+    "ctrl": "ctrl",
+    "left ctrl": "ctrl_left",
+    "right shift": "shift_right",
+    "shift": "shift",
+    "left shift": "shift_left",
+    "right ctrl": "ctrl_right",
 }
 
 
@@ -82,20 +102,16 @@ class CH9329:
     def wheel(self, delta: int = 1) -> None:
         mouse.wheel(self.serial, delta)
 
-    def press(self, key: str, state: int) -> None:
-        """
-        :param key: keysym attribute of tkinter key event
-        :param state: state attribute of tkinter key event
-        """
-        modifiers = [v for k, v in MODIFIERS.items() if k & state]
-        modifier = modifiers[0] if modifiers else ""
+    def press(self, key: str, modifiers: list[Modifier] = []) -> None:
         key = key.lower()
         key = KEY_MAP.get(key, key)
-        keyboard.press(self.serial, key, modifier)
+        keyboard.press(self.serial, key, modifiers)
 
     def release(self) -> None:
         keyboard.release(self.serial)
 
-    def press_and_release(self, key: str, modifier: str = "") -> None:
-        keyboard.press(self.serial, key, modifier)
+    def press_and_release(
+        self, key: str, modifiers: list[Modifier] = []
+    ) -> None:
+        keyboard.press(self.serial, key, modifiers)
         keyboard.release(self.serial)
