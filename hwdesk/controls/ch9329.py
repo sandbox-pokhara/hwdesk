@@ -95,6 +95,12 @@ class CH9329:
         mouse.move(self.serial, x, y)
         self.last_moved = time.time()
 
+    def mouse_press(self, button: str = "left") -> None:
+        mouse.press(self.serial, button)
+
+    def mouse_release(self) -> None:
+        mouse.release(self.serial)
+
     def click(self, button: str = "left") -> None:
         mouse.press(self.serial, button)
         mouse.release(self.serial)
@@ -102,12 +108,12 @@ class CH9329:
     def wheel(self, delta: int = 1) -> None:
         mouse.wheel(self.serial, delta)
 
-    def press(self, key: str, modifiers: list[Modifier] = []) -> None:
+    def key_press(self, key: str, modifiers: list[Modifier] = []) -> None:
         key = key.lower()
         key = KEY_MAP.get(key, key)
         keyboard.press(self.serial, key, modifiers)
 
-    def release(self) -> None:
+    def key_release(self) -> None:
         keyboard.release(self.serial)
 
     def press_and_release(

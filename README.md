@@ -27,6 +27,7 @@ To exit the program, press `alt+f4` or `esc`.
 ## Limitations
 
 - Mouse Drag
+- Mouse Middle
 
 ## License
 

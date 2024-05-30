@@ -38,8 +38,8 @@ class GUI(tk.Tk):
         self.exit_flag = Event()
         self.modifiers: set[str] = set()
 
-        self.bind("<Button-1>", self.on_left_click)
-        self.bind("<Button-3>", self.on_right_click)
+        self.bind("<ButtonPress>", self.on_mouse_press)
+        self.bind("<ButtonRelease>", self.on_mouse_release)
         self.bind("<MouseWheel>", self.on_wheel)
         self.bind("<Motion>", self.on_move)
 
@@ -58,20 +58,20 @@ class GUI(tk.Tk):
             try:
                 if is_modifier:
                     self.modifiers.add(key_event.name)
-                    self.ch9329.press(key_event.name)
+                    self.ch9329.key_press(key_event.name)
                 else:
                     modifiers: list[Modifier] = []
                     for m in self.modifiers:
                         if m in MODIFIER_MAP:
                             modifiers.append(MODIFIER_MAP[m])
-                    self.ch9329.press(key_event.name, modifiers)
+                    self.ch9329.key_press(key_event.name, modifiers)
             except InvalidKey as e:
                 logger.error(f"Invalidkey: {e.args}")
 
         elif key_event.name and key_event.event_type == "up":
             if is_modifier and key_event.name in self.modifiers:
                 self.modifiers.remove(key_event.name)
-            self.ch9329.release()
+            self.ch9329.key_release()
 
     def gui_loop(self):
         if self.exit_flag.is_set():
@@ -102,13 +102,20 @@ class GUI(tk.Tk):
         self.update()
 
     def on_move(self, event: Any):
+        # TODO: fix drag
         self.ch9329.move(event.x, event.y)
-
-    def on_left_click(self, event: Any):
-        self.ch9329.click(button="left")
-
-    def on_right_click(self, event: Any):
-        self.ch9329.click(button="right")
 
     def on_wheel(self, event: Any):
         self.ch9329.wheel(event.delta // 100)
+
+    def on_mouse_press(self, event: Any):
+        if event.num == 1:
+            self.ch9329.mouse_press("left")
+        elif event.num == 3:
+            self.ch9329.mouse_press("right")
+        else:
+            # TODO: implement mouse middle
+            pass
+
+    def on_mouse_release(self, event: Any):
+        self.ch9329.mouse_release()
