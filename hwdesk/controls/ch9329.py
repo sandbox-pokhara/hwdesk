@@ -13,7 +13,14 @@ MODIFIERS = {
 }
 
 KEY_MAP = {
+    "left windows": "win",
+    "right windows": "win",
+    "left shift": "shift",
+    "right shift": "shift",
+    "left ctrl": "ctrl",
+    "right ctrl": "ctrl",
     "space": " ",
+    "decimal": ".",
     "period": ".",
     "backspace": "backspace",
     "enter": "\r",

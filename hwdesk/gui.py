@@ -1,8 +1,9 @@
 import tkinter as tk
 from typing import Any
+from typing import Callable
 
 import cv2
-from ch9329.exceptions import InvalidKey
+import keyboard
 from cv2.typing import MatLike
 from PIL import Image
 from PIL import ImageTk
@@ -12,9 +13,15 @@ from hwdesk.camera.base import BaseCamera
 from hwdesk.constants import HEIGHT
 from hwdesk.constants import WIDTH
 from hwdesk.controls.ch9329 import CH9329
+from hwdesk.controls.ch9329 import MODIFIERS
 
 
 class GUI(tk.Tk):
+
+    # we need to keep track of hook callback to
+    # unhook it
+    _hook: list[Callable[[], None]] = []
+
     def __init__(
         self,
         camera: BaseCamera,
@@ -33,21 +40,46 @@ class GUI(tk.Tk):
         self.fps_font_size = 16
         self.attributes("-fullscreen", True)  # type:ignore
 
+        self.down_modifier: str = ""
+
         self.bind("<Button-1>", self.on_left_click)
         self.bind("<Button-3>", self.on_right_click)
         self.bind("<MouseWheel>", self.on_wheel)
         self.bind("<Motion>", self.on_move)
-        self.bind("<KeyPress>", self.on_key_down)
-        self.bind("<KeyRelease>", self.on_key_up)
-
         self.canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT)
         self.canvas.pack()
 
         self.after(int(1000 / self.camera.fps), self.gui_loop)
 
+    def on_key_event(self, key_event: keyboard.KeyboardEvent):
+        if key_event.name == "esc" and self.exit_on_esc:
+            keyboard.unhook_all()
+            self.destroy()
+        if key_event.name and key_event.event_type == "down":
+            modifier = [
+                k for k, v in MODIFIERS.items() if v == self.down_modifier
+            ]
+            if modifier:
+                self.ch9329.press(key_event.name, modifier[0])
+            else:
+                self.ch9329.press(key_event.name, 0)
+            if keyboard.is_modifier(key_event.scan_code):
+                self.down_modifier = key_event.name
+        elif key_event.event_type == "up":
+            if keyboard.is_modifier(key_event.scan_code):
+                self.down_modifier = ""
+            self.ch9329.release()
+
+        logger.info(f"[EVENT]{key_event}")
+
     def gui_loop(self):
         if self.camera.img is not None:
             self.imshow(self.camera.img)
+        if self and self.focus_displayof():
+            self._hook.append(keyboard.hook(self.on_key_event, suppress=True))
+        elif self._hook:
+            keyboard.unhook_all()
+
         self.after(int(1000 / self.camera.fps), self.gui_loop)
 
     def imshow(self, img: MatLike):
@@ -78,17 +110,6 @@ class GUI(tk.Tk):
 
     def on_right_click(self, event: Any):
         self.ch9329.click(button="right")
-
-    def on_key_down(self, event: Any):
-        try:
-            self.ch9329.press(event.keysym, event.state)
-        except InvalidKey as e:
-            logger.error(f"Invalidkey: {e.args}")
-
-    def on_key_up(self, event: Any):
-        self.ch9329.release()
-        if self.exit_on_esc and event.keysym.lower() == "escape":
-            self.destroy()
 
     def on_wheel(self, event: Any):
         self.ch9329.wheel(event.delta // 100)
