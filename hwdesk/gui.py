@@ -102,11 +102,7 @@ class GUI(tk.Tk):
         self.update()
 
     def on_move(self, event: Any):
-        mere_pixel = 1
-        x, y = event.x // mere_pixel, event.y // mere_pixel
-        x *= mere_pixel
-        y *= mere_pixel
-        self.ch9329.move(x, y)
+        self.ch9329.move(event.x, event.y)
 
     def on_left_click(self, event: Any):
         self.ch9329.click(button="left")
