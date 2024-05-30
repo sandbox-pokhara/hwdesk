@@ -1,9 +1,11 @@
 import tkinter as tk
+from threading import Event
 from typing import Any
 from typing import Callable
 
 import cv2
 import keyboard
+from ch9329.exceptions import InvalidKey
 from cv2.typing import MatLike
 from PIL import Image
 from PIL import ImageTk
@@ -39,7 +41,7 @@ class GUI(tk.Tk):
         self.show_fps = fps
         self.fps_font_size = 16
         self.attributes("-fullscreen", True)  # type:ignore
-
+        self.exit_flag = Event()
         self.down_modifier: str = ""
 
         self.bind("<Button-1>", self.on_left_click)
@@ -53,16 +55,20 @@ class GUI(tk.Tk):
 
     def on_key_event(self, key_event: keyboard.KeyboardEvent):
         if key_event.name == "esc" and self.exit_on_esc:
+            self.exit_flag.set()
             keyboard.unhook_all()
             self.destroy()
         if key_event.name and key_event.event_type == "down":
             modifier = [
                 k for k, v in MODIFIERS.items() if v == self.down_modifier
             ]
-            if modifier:
-                self.ch9329.press(key_event.name, modifier[0])
-            else:
-                self.ch9329.press(key_event.name, 0)
+            try:
+                if modifier:
+                    self.ch9329.press(key_event.name, modifier[0])
+                else:
+                    self.ch9329.press(key_event.name, 0)
+            except InvalidKey as e:
+                logger.error(f"Invalidkey: {e.args}")
             if keyboard.is_modifier(key_event.scan_code):
                 self.down_modifier = key_event.name
         elif key_event.event_type == "up":
@@ -70,9 +76,9 @@ class GUI(tk.Tk):
                 self.down_modifier = ""
             self.ch9329.release()
 
-        logger.info(f"[EVENT]{key_event}")
-
     def gui_loop(self):
+        if self.exit_flag.is_set():
+            return
         if self.camera.img is not None:
             self.imshow(self.camera.img)
         if self and self.focus_displayof():

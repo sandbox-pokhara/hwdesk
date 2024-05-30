@@ -23,7 +23,7 @@ KEY_MAP = {
     "decimal": ".",
     "period": ".",
     "backspace": "backspace",
-    "enter": "\r",
+    "enter": "\n",
     "escape": "\x1b",
     "quotedbl": '"',
     "quote": "'",
