@@ -2,6 +2,7 @@ import tkinter as tk
 from typing import Any
 
 import cv2
+import keyboard
 from ch9329.exceptions import InvalidKey
 from cv2.typing import MatLike
 from PIL import Image
@@ -37,9 +38,18 @@ class GUI(tk.Tk):
         self.bind("<Button-3>", self.on_right_click)
         self.bind("<MouseWheel>", self.on_wheel)
         self.bind("<Motion>", self.on_move)
+
+        self.bind("<Win_L>", self.no_bubble_key_event)
+        self.bind("<Win_R>", self.no_bubble_key_event)
+        self.bind("<Alt-F4>", self.no_bubble_key_event)
+
         self.bind("<KeyPress>", self.on_key_down)
         self.bind("<KeyRelease>", self.on_key_up)
 
+        # "<Alt-Tab>" doesnot seems to be handled properly by tkinter
+        # it allows pass thorugh, that's why we need keyboard module for
+        # that to suppress the event
+        keyboard.add_hotkey("alt + tab", self.alt_tab_press, suppress=True)
         self.canvas = tk.Canvas(self, width=WIDTH, height=HEIGHT)
         self.canvas.pack()
 
@@ -65,6 +75,32 @@ class GUI(tk.Tk):
             )
             l.place(x=0, y=0)
         self.update()
+
+    def no_bubble_key_event(self, event: Any):
+        try:
+            self.ch9329.press(event.keysym, event.state)
+        except InvalidKey as e:
+            logger.error(f"Invalidkey: {e.args}")
+        else:
+            self.ch9329.release()
+        finally:
+            # this prevents from events bubbling
+            return "break"
+
+    def alt_tab_press(self, _: Any | None = None):
+        try:
+            ALT_KEY = 0x20000
+            self.ch9329.press("tab", ALT_KEY)
+        except InvalidKey as e:
+            logger.error(f"Invalidkey: {e.args}")
+
+    def win_key_press(self, _: Any | None = None):
+        try:
+            self.ch9329.press("gui", 0)
+        except InvalidKey as e:
+            logger.error(f"Invalidkey: {e.args}")
+        else:
+            self.ch9329.release()
 
     def on_move(self, event: Any):
         mere_pixel = 1

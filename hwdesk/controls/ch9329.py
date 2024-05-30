@@ -13,11 +13,30 @@ MODIFIERS = {
 }
 
 KEY_MAP = {
+    # shift key
+    "shift_l": "shift",
+    "shift_r": "shift",
+    "shift": "shift",
+    # control key
+    "control_r": "ctrl",
+    "control_l": "ctrl",
+    "ctrl": "ctrl",
+    # alt key
+    "alt_l": "alt",
+    "alt_r": "alt",
+    "alt": "alt",
+    # window key
+    "win_l": "win",
+    "win_r": "win",
+    # super key
+    # SUPER KEY IS DIFFERENT FOR MACOS
+    "super_l": "win",
+    "super_r": "win",
+    # other keys
     "space": " ",
     "period": ".",
     "backspace": "backspace",
-    "enter": "\r",
-    "escape": "\x1b",
+    "enter": "\r\n",
     "quotedbl": '"',
     "quote": "'",
     "grave": "`",
