@@ -18,7 +18,7 @@ def ask_ch9329_port():
                 serial_number = get_serial_number(ser)
                 prompt.append(f"Port={i.name}, Serial={serial_number}")
                 valid_ports.append(i.name)
-        except serial.serialutil.SerialException:
+        except (serial.serialutil.SerialException, UnicodeDecodeError):
             pass
     if valid_ports == []:
         showerror("HwDesk Error", "No CH9329 devices found.")
