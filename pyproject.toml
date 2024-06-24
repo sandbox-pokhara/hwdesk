@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hwdesk"
-version = "1.0.5"
+version = "1.0.6"
 dependencies = [
     "ch9329>=1.2.1",
     "keyboard==0.13.5",
     "opencv-cam-idx==1.0.1",
-    "opencv-python==4.9.0.80",
+    "opencv-contrib-python==4.9.0.80",
     "pillow==10.3.0",
     "pydantic==2.6.4",
 ]
