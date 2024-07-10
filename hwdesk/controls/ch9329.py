@@ -95,7 +95,6 @@ class CH9329:
         # ignor negative values
         if x < 0 or y < 0:
             return
-        print(self.serial, x, y)
         mouse.move(self.serial, x, y)
         self.last_moved = time.time()
 
