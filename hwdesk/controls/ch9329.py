@@ -79,9 +79,12 @@ MODIFIER_MAP: dict[str, Modifier] = {
 
 
 class CH9329:
-    def __init__(self, port: str) -> None:
+    def __init__(self, port: str, serial: Serial | None = None) -> None:
         self.port = port
-        self.serial = Serial(port, 9600, timeout=0.05)
+        if serial:
+            self.serial = serial
+        else:
+            self.serial = Serial(port, 9600, timeout=0.05)
         self.last_moved = time.time()
         super().__init__()
 
@@ -92,6 +95,7 @@ class CH9329:
         # ignor negative values
         if x < 0 or y < 0:
             return
+        print(self.serial, x, y)
         mouse.move(self.serial, x, y)
         self.last_moved = time.time()
 

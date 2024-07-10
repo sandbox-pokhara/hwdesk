@@ -14,7 +14,11 @@ from hwdesk.constants import WIDTH
 
 class BaseCamera:
     def __init__(
-        self, index: int, fps: int = 10, exit_flag: Event | None = None
+        self,
+        index: int,
+        fps: int = 10,
+        exit_flag: Event | None = None,
+        camera: cv2.VideoCapture | None = None,
     ):
         logger.info("Initializing camera...")
         self.img: MatLike | None = np.zeros((HEIGHT, WIDTH, 3), np.uint8)
@@ -22,7 +26,12 @@ class BaseCamera:
         self.index = index
         self.fps = fps
         self.current_fps = fps
-        self.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+        self.auto_release = False
+        if camera is not None:
+            self.cap = camera
+        else:
+            self.auto_release = True
+            self.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
         if not self.cap.isOpened():
             logger.info(f"Openning video capture device ({index})...")
             self.cap.open(index)
@@ -41,7 +50,8 @@ class BaseCamera:
         while True:
             if self.exit_flag and self.exit_flag.is_set():
                 logger.info("Releasing camera...")
-                self.release()
+                if self.auto_release:
+                    self.release()
                 break
             start = time.time()
             self.screenshot()

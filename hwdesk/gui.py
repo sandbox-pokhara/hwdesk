@@ -88,7 +88,7 @@ class GUI(tk.Tk):
     def imshow(self, img: MatLike):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.image = Image.fromarray(img)  # type: ignore
-        self.tk_image = ImageTk.PhotoImage(self.image)
+        self.tk_image = ImageTk.PhotoImage(master=self, image=self.image)
         self.canvas.create_image(0, 0, image=self.tk_image, anchor=tk.NW)  # type: ignore
         if self.show_fps:
             l = tk.Label(
