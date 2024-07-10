@@ -49,8 +49,8 @@ class BaseCamera:
     def screenshot_loop(self):
         while True:
             if self.exit_flag and self.exit_flag.is_set():
-                logger.info("Releasing camera...")
                 if self.auto_release:
+                    logger.info("Releasing camera...")
                     self.release()
                 break
             start = time.time()
