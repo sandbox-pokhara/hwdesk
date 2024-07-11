@@ -15,26 +15,17 @@ from hwdesk.constants import WIDTH
 class BaseCamera:
     def __init__(
         self,
-        index: int,
+        camera: cv2.VideoCapture,
         fps: int = 10,
         exit_flag: Event | None = None,
-        camera: cv2.VideoCapture | None = None,
     ):
         logger.info("Initializing camera...")
         self.img: MatLike | None = np.zeros((HEIGHT, WIDTH, 3), np.uint8)
         self.exit_flag = exit_flag
-        self.index = index
         self.fps = fps
         self.current_fps = fps
-        self.auto_release = False
-        if camera is not None:
-            self.cap = camera
-        else:
-            self.auto_release = True
-            self.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
-        if not self.cap.isOpened():
-            logger.info(f"Openning video capture device ({index})...")
-            self.cap.open(index)
+        self.cap = camera
+        assert self.cap.isOpened()
         assert self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
         assert self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
         assert self.cap.set(cv2.CAP_PROP_FPS, fps)
@@ -46,10 +37,10 @@ class BaseCamera:
     def screenshot(self):
         self.img = self.cap.read()[1]
 
-    def screenshot_loop(self):
+    def screenshot_loop(self, auto_release: bool):
         while True:
             if self.exit_flag and self.exit_flag.is_set():
-                if self.auto_release:
+                if auto_release:
                     logger.info("Releasing camera...")
                     self.release()
                 break
