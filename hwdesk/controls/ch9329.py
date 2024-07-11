@@ -79,9 +79,8 @@ MODIFIER_MAP: dict[str, Modifier] = {
 
 
 class CH9329:
-    def __init__(self, port: str) -> None:
-        self.port = port
-        self.serial = Serial(port, 9600, timeout=0.05)
+    def __init__(self, serial: Serial) -> None:
+        self.serial = serial
         self.last_moved = time.time()
         super().__init__()
 

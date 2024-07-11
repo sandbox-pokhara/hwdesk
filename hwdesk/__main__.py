@@ -2,6 +2,9 @@ from argparse import ArgumentParser
 from threading import Event
 from threading import Thread
 
+import cv2
+from serial import Serial
+
 from hwdesk import logger
 from hwdesk.camera.ms2130 import MS2130
 from hwdesk.camera.prompt import ask_camera_idx
@@ -21,10 +24,17 @@ def main():
     if not ch9329_port:
         exit(1)
     exit_flag = Event()
-    ch9329 = CH9329(ch9329_port)
-    camera = MS2130(camera_idx, args.fps, exit_flag)
+    serial = Serial(ch9329_port, 9600, timeout=0.05)
+    video_capture = cv2.VideoCapture(camera_idx, cv2.CAP_DSHOW)
+    if not video_capture.isOpened():
+        logger.info(f"Openning video capture device ({camera_idx})...")
+        video_capture.open(camera_idx)
+    ch9329 = CH9329(serial)
+    camera = MS2130(video_capture, args.fps, exit_flag)
     gui = GUI(camera, ch9329, title=f"HwDesk - {camera_name} - {ch9329_port}")
-    Thread(target=camera.screenshot_loop).start()
+    Thread(
+        target=camera.screenshot_loop, kwargs={"auto_release": True}
+    ).start()
     gui.mainloop()
     exit_flag.set()
     logger.info("Closing CH9329 port...")
