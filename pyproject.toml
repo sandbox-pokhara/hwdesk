@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hwdesk"
-version = "1.0.6"
+version = "1.0.7"
 dependencies = [
     "ch9329>=1.2.1",
     "keyboard==0.13.5",
