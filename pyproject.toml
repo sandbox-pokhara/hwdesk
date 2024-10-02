@@ -7,12 +7,12 @@ name = "hwdesk"
 version = "1.0.7"
 dependencies = [
     "ch9329>=1.2.1",
-    "keyboard==0.13.5",
-    "numpy==1.26.4",
-    "opencv-cam-idx==1.0.1",
-    "opencv-contrib-python==4.9.0.80",
-    "pillow==10.3.0",
-    "pydantic==2.6.4",
+    "keyboard",
+    "numpy",
+    "opencv-cam-idx",
+    "opencv-contrib-python",
+    "pillow",
+    "pydantic",
 ]
 requires-python = ">=3.11"
 authors = [{ name = "Pradish Bijukchhe", email = "pradish@sandbox.com.np" }]
